@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent (typeof(Bomb))]
-
 public class Explosion : MonoBehaviour
 {
     [SerializeField] private ParticleSystem _explosionEffect;

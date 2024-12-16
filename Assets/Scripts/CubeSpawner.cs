@@ -13,6 +13,8 @@ public class CubeSpawner : MonoBehaviour
     private bool _isCoroutineActive = false;
 
     public event Action<Transform> CollisionTransformDetected;
+    public event Action SpawnCube;
+    public event Action ReturnCubeToPool;
 
     public int TotalSpawnedObjects { get; private set; } = 0;
     public int ActiveObjectsCount { get; private set; } = 0;
@@ -24,7 +26,7 @@ public class CubeSpawner : MonoBehaviour
             if (!_isCoroutineActive)
             {
                 _isCoroutineActive = true;
-                _coroutineSpawn = StartCoroutine(TimerSpawnCube());
+                _coroutineSpawn = StartCoroutine(CountDelay());
             }
             else
             {
@@ -39,10 +41,13 @@ public class CubeSpawner : MonoBehaviour
         _poolCubes = new CustomObjectPool<Cube>(_cubePrefab);
     }
 
-    private void SpawnObject()
+    private void Spawn()
     {
-        TotalSpawnedObjects++;
+        TotalSpawnedObjects++;       
         ActiveObjectsCount++;
+
+        SpawnCube?.Invoke();
+
         Cube newCube = _poolCubes.Get();
         newCube.OnCollided += ReturnToPool;
         newCube.transform.position = GetRandomPosition();
@@ -53,11 +58,11 @@ public class CubeSpawner : MonoBehaviour
         return new Vector3(UnityEngine.Random.Range(transform.position.x - 5, transform.position.x + 5), transform.position.y, UnityEngine.Random.Range(transform.position.z - 5, transform.position.z + 5));
     }
 
-    private IEnumerator TimerSpawnCube()
+    private IEnumerator CountDelay()
     {
-        while (true)
+        while (_isCoroutineActive)
         {
-            SpawnObject();
+            Spawn();
             WaitForSeconds waitForSeconds = new WaitForSeconds(_spawnDelay);
             yield return waitForSeconds;
         }
@@ -67,10 +72,10 @@ public class CubeSpawner : MonoBehaviour
     {
         ActiveObjectsCount--;
 
+        ReturnCubeToPool?.Invoke();
         CollisionTransformDetected?.Invoke(cube.transform);
 
         cube.OnCollided -= ReturnToPool;
         _poolCubes.ReturnToPool(cube);
-
     }
 }

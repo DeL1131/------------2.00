@@ -12,7 +12,7 @@ public class Bomb : MonoBehaviour
 
     private void OnEnable()
     {
-        _explosionDelay = UnityEngine.Random.Range(0, _maxExplosionDelay);
+        _explosionDelay = UnityEngine.Random.Range(_minExplosionDelay, _maxExplosionDelay);
         StartCoroutine(ExplosionTimer());
     }
 
