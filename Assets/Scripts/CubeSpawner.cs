@@ -2,8 +2,10 @@ using System;
 using UnityEngine;
 using System.Collections;
 
-public class CubeSpawner : MonoBehaviour
+public class CubeSpawner : Spawner
 {
+    private const KeyCode SpawnCubeKey = KeyCode.Space;
+
     [SerializeField] private Cube _cubePrefab;
 
     private CustomObjectPool<Cube> _poolCubes;
@@ -13,15 +15,15 @@ public class CubeSpawner : MonoBehaviour
     private bool _isCoroutineActive = false;
 
     public event Action<Transform> CollisionTransformDetected;
-    public event Action SpawnCube;
-    public event Action ReturnCubeToPool;
 
-    public int TotalSpawnedObjects { get; private set; } = 0;
-    public int ActiveObjectsCount { get; private set; } = 0;
+    private void Start()
+    {
+        _poolCubes = new CustomObjectPool<Cube>(_cubePrefab);
+    }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(SpawnCubeKey))
         {
             if (!_isCoroutineActive)
             {
@@ -36,17 +38,12 @@ public class CubeSpawner : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void SpawnObject()
     {
-        _poolCubes = new CustomObjectPool<Cube>(_cubePrefab);
-    }
-
-    private void Spawn()
-    {
-        TotalSpawnedObjects++;       
+        TotalSpawnedObjects++;
         ActiveObjectsCount++;
 
-        SpawnCube?.Invoke();
+        InvokeObjectSpawned();
 
         Cube newCube = _poolCubes.Get();
         newCube.OnCollided += ReturnToPool;
@@ -62,7 +59,7 @@ public class CubeSpawner : MonoBehaviour
     {
         while (_isCoroutineActive)
         {
-            Spawn();
+            SpawnObject();
             WaitForSeconds waitForSeconds = new WaitForSeconds(_spawnDelay);
             yield return waitForSeconds;
         }
@@ -72,7 +69,7 @@ public class CubeSpawner : MonoBehaviour
     {
         ActiveObjectsCount--;
 
-        ReturnCubeToPool?.Invoke();
+        InvokeReturnedToPool();
         CollisionTransformDetected?.Invoke(cube.transform);
 
         cube.OnCollided -= ReturnToPool;

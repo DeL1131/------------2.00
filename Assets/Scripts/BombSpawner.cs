@@ -1,18 +1,12 @@
 using System;
 using UnityEngine;
 
-public class BombSpawner : MonoBehaviour
+public class BombSpawner : Spawner
 {
     [SerializeField] private Bomb _bombPrefab;
     [SerializeField] private CubeSpawner _cubeSpawner;
 
     private CustomObjectPool<Bomb> _poolBombs;
-
-    public event Action SpawnBomb;
-    public event Action ReturnBombToPool;
-
-    public int TotalSpawnedObjects { get; private set; } = 0;
-    public int ActiveObjectsCount { get; private set; } = 0;
 
     private void Awake()
     {
@@ -21,34 +15,34 @@ public class BombSpawner : MonoBehaviour
 
     private void OnEnable()
     {
-        _cubeSpawner.CollisionTransformDetected += Spawn;
+        _cubeSpawner.CollisionTransformDetected += SpawnObject;
     }
 
     private void OnDisable()
     {
-        _cubeSpawner.CollisionTransformDetected -= Spawn;
+        _cubeSpawner.CollisionTransformDetected -= SpawnObject;
     }
 
-    private void Spawn(Transform transform)
+    private void SpawnObject(Transform transform)
     {
         TotalSpawnedObjects++;
         ActiveObjectsCount++;
 
-        SpawnBomb?.Invoke();
+        InvokeObjectSpawned();
 
         Bomb newBomb = _poolBombs.Get(); 
         newBomb.transform.position = transform.position;
 
-        newBomb.OnExplosion += ReturnToPool;
+        newBomb.Exploding += ReturnToPool;
     }
 
     private void ReturnToPool(Bomb bomb)
     {
         ActiveObjectsCount--;
 
-        ReturnBombToPool?.Invoke();
+        InvokeReturnedToPool();
 
         _poolBombs.ReturnToPool(bomb);
-        bomb.OnExplosion -= ReturnToPool;
+        bomb.Exploding -= ReturnToPool;
     }
 }

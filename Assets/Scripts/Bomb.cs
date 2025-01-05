@@ -8,18 +8,17 @@ public class Bomb : MonoBehaviour
     private float _minExplosionDelay = 0;
     private float _explosionDelay;
 
-    public event Action<Bomb> OnExplosion;
+    public event Action<Bomb> Exploding;
 
     private void OnEnable()
     {
         _explosionDelay = UnityEngine.Random.Range(_minExplosionDelay, _maxExplosionDelay);
-        StartCoroutine(ExplosionTimer());
+        StartCoroutine(StartExplosionTimer());
     }
 
-    private IEnumerator ExplosionTimer()
-    {
-        WaitForSeconds waitForSeconds = new WaitForSeconds(_explosionDelay);
-        yield return waitForSeconds;
-        OnExplosion?.Invoke(this);
+    private IEnumerator StartExplosionTimer()
+    {       
+        yield return new WaitForSeconds(_explosionDelay);
+        Exploding?.Invoke(this);
     }
 }
