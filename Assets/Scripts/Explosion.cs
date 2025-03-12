@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent (typeof(Bomb))]
+
 public class Explosion : MonoBehaviour
 {
     [SerializeField] private ParticleSystem _explosionEffect;
@@ -17,12 +18,12 @@ public class Explosion : MonoBehaviour
 
     private void OnEnable()
     {
-        _bomb.Exploding += Explode;
+        _bomb.Exploded += Explode;
     }
 
     private void OnDisable()
     {
-        _bomb.Exploding -= Explode;
+        _bomb.Exploded -= Explode;
     }
 
     private void Explode(Bomb bomb)

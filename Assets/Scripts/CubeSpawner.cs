@@ -25,8 +25,9 @@ public class CubeSpawner : Spawner
     {
         if (Input.GetKeyDown(SpawnCubeKey))
         {
-            if (!_isCoroutineActive)
+            if (_isCoroutineActive == false)
             {
+                Debug.Log("s");
                 _isCoroutineActive = true;
                 _coroutineSpawn = StartCoroutine(CountDelay());
             }

@@ -8,7 +8,7 @@ public class Bomb : MonoBehaviour
     private float _minExplosionDelay = 0;
     private float _explosionDelay;
 
-    public event Action<Bomb> Exploding;
+    public event Action<Bomb> Exploded;
 
     private void OnEnable()
     {
@@ -19,6 +19,6 @@ public class Bomb : MonoBehaviour
     private IEnumerator StartExplosionTimer()
     {       
         yield return new WaitForSeconds(_explosionDelay);
-        Exploding?.Invoke(this);
+        Exploded?.Invoke(this);
     }
 }

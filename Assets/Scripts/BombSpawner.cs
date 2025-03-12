@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class BombSpawner : Spawner
@@ -33,7 +32,7 @@ public class BombSpawner : Spawner
         Bomb newBomb = _poolBombs.Get(); 
         newBomb.transform.position = transform.position;
 
-        newBomb.Exploding += ReturnToPool;
+        newBomb.Exploded += ReturnToPool;
     }
 
     private void ReturnToPool(Bomb bomb)
@@ -43,6 +42,6 @@ public class BombSpawner : Spawner
         InvokeReturnedToPool();
 
         _poolBombs.ReturnToPool(bomb);
-        bomb.Exploding -= ReturnToPool;
+        bomb.Exploded -= ReturnToPool;
     }
 }
