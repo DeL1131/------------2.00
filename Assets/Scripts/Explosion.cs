@@ -1,32 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent (typeof(Bomb))]
-
 public class Explosion : MonoBehaviour
 {
     [SerializeField] private ParticleSystem _explosionEffect;
     [SerializeField] private float _explosionRadius;
     [SerializeField] private float _explosionForce;
 
-    private Bomb _bomb;
-
-    private void Awake()
-    {
-        _bomb = GetComponent<Bomb>();
-    }
-
-    private void OnEnable()
-    {
-        _bomb.Exploded += Explode;
-    }
-
-    private void OnDisable()
-    {
-        _bomb.Exploded -= Explode;
-    }
-
-    private void Explode(Bomb bomb)
+    public void Explode()
     {
         foreach (Rigidbody exploadableObject in GetExplodableObjects())
         {

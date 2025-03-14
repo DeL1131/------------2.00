@@ -1,11 +1,12 @@
 using TMPro;
 using UnityEngine;
 
-public class ViewInformation : MonoBehaviour
+public abstract class ViewInformation<T> : MonoBehaviour where T : MonoBehaviour
 {
-    [SerializeField] private Spawner _spawner;
+    [SerializeField] private Spawner<T> _spawner;
     [SerializeField] private TextMeshProUGUI _textTotalSpawnObject;
     [SerializeField] private TextMeshProUGUI _textActiveSpawnObject;
+    [SerializeField] private TextMeshProUGUI _textCountObjectsCreated;
 
     private void OnEnable()
     {
@@ -19,9 +20,10 @@ public class ViewInformation : MonoBehaviour
         _spawner.ReturnedToPool -= ShowInfo;
     }
 
-    private void ShowInfo()
+    protected void ShowInfo()
     {
         _textTotalSpawnObject.text = _spawner.TotalSpawnedObjects.ToString();
         _textActiveSpawnObject.text = _spawner.ActiveObjectsCount.ToString();
+        _textCountObjectsCreated.text = _spawner.CountObjectsCreated.ToString();
     }
 }

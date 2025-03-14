@@ -1,47 +1,30 @@
 using UnityEngine;
 
-public class BombSpawner : Spawner
+public class BombSpawner : Spawner<Bomb>
 {
-    [SerializeField] private Bomb _bombPrefab;
     [SerializeField] private CubeSpawner _cubeSpawner;
-
-    private CustomObjectPool<Bomb> _poolBombs;
-
-    private void Awake()
-    {
-        _poolBombs = new CustomObjectPool<Bomb>(_bombPrefab);
-    }
 
     private void OnEnable()
     {
-        _cubeSpawner.CollisionTransformDetected += SpawnObject;
+        _cubeSpawner.CubeReleased += HandleSpawn;
     }
 
     private void OnDisable()
     {
-        _cubeSpawner.CollisionTransformDetected -= SpawnObject;
+        _cubeSpawner.CubeReleased -= HandleSpawn;
     }
 
-    private void SpawnObject(Transform transform)
+    private void HandleSpawn(Transform transform)
     {
-        TotalSpawnedObjects++;
-        ActiveObjectsCount++;
-
-        InvokeObjectSpawned();
-
-        Bomb newBomb = _poolBombs.Get(); 
+        Bomb newBomb = SpawnObject(); 
         newBomb.transform.position = transform.position;
-
-        newBomb.Exploded += ReturnToPool;
+        newBomb.Exploded += HandleBombReturn;
     }
 
-    private void ReturnToPool(Bomb bomb)
+    private void HandleBombReturn(Bomb bomb)
     {
-        ActiveObjectsCount--;
-
-        InvokeReturnedToPool();
-
-        _poolBombs.ReturnToPool(bomb);
-        bomb.Exploded -= ReturnToPool;
+        bomb.ResetState();
+        bomb.Exploded -= HandleBombReturn;
+        ReturnToPool(bomb);
     }
 }

@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class CustomObjectPool<T> where T : MonoBehaviour
 {
-    private readonly List<T> _availableObjects = new List<T>(); 
-    private readonly T _prefab; 
-    private readonly Transform _parentTransform; 
+    private readonly Queue<T> _availableObjects = new Queue<T>();
+    private readonly T _prefab;
+    private readonly Transform _parentTransform;
 
     public CustomObjectPool(T prefab, Transform parentTransform = null)
     {
@@ -19,8 +19,7 @@ public class CustomObjectPool<T> where T : MonoBehaviour
 
         if (_availableObjects.Count > 0)
         {
-            instance = _availableObjects[0];
-            _availableObjects.RemoveAt(0);
+            instance = _availableObjects.Dequeue();
             instance.gameObject.SetActive(true);
         }
         else
@@ -33,12 +32,8 @@ public class CustomObjectPool<T> where T : MonoBehaviour
 
     public void ReturnToPool(T instance)
     {
-        Rigidbody rigidbody = instance.GetComponent<Rigidbody>();
-        rigidbody.isKinematic = true;
-        rigidbody.isKinematic = false;
         instance.transform.rotation = Quaternion.identity;
-
-        instance.gameObject.SetActive(false); 
-        _availableObjects.Add(instance);     
+        instance.gameObject.SetActive(false);
+        _availableObjects.Enqueue(instance);
     }
 }
